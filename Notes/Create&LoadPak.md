@@ -15,7 +15,8 @@
 或  
 `UE4Editor-Cmd.exe <GameName> -run=cook -targetplatform=<Plat1>+<Plat2> [-cookonthefly] [-iterate] [-map=<Map1>+<Map2>] `  
 该commandlet必须通过`-run=cook`指定，还必须指定要烘焙的平台。该命令会为指定的平台生成数据， 并将数据保存在以下位置：  
-`<Game>/Saved/Sandboxes/Cooked-<Platform>`
+`<Game>/Saved/Sandboxes/Cooked-<Platform>`  
+  
 |  选项   | 说明  |
 |  ----  | ----  |
 | `-targetplatform=<Plat1>+<Plat2>`  | `指定要烘焙的平台。可用平台列表包含WindowsNoEditor、WindowsServer、LinuxServer、PS4, XboxOne、IOS和Android。` |
@@ -25,18 +26,19 @@
 | `-MapIniSection=<ini file section>`  | `指定ini文件中包含贴图名称的分段。烘焙器将烘焙指定分段中指定的所有贴图。` |
 | `-UnVersioned`  | `保存所有烘焙的数据包，不含版本。然后这些数据包在加载时会被假定为最新版本。` |
 | `-CookAll`  | `烘焙所有内容。` |
-| `-Compressed`  | `告知烘焙器压缩烘焙过的数据包。` |
+| `-Compressed`  | `告知烘焙器压缩烘焙过的数据包。` |  
 
 ### UnrealPak 打包Pak文件
 Cook完成后找到 UnrealPak.exe文件，位于Engine\Binaries\Win64目录下，命令行启动。
-常用命令
+常用命令  
+
 |  命令   | 说明  |
 |  ----  | ----  |
 |UnrealPak Test.pak –create=D:\MyUE4Projects\SomeFolder\ |将指定文件夹下的文件，打包到指定目录下的Pak文件|
 |UnrealPak Test.pak –create=D:\MyUE4Projects\SomeFolder\ -compress |创建压缩后的Pak|
 |UnrealPak Test.pak –create=D:\MyUE4Projects\SomeFolder\ -aes=77777777777777777777777777777777 -encryptindex |给Pak加秘钥|
 |UnrealPak Test.pak -list |查看列出Pak文件中的信息|
-|UnrealPak Test.pak –extract=E:\ExtractedFolder\ |解压Pak文件到指定目录|
+|UnrealPak Test.pak –extract=E:\ExtractedFolder\ |解压Pak文件到指定目录|  
 
 ### 从Pak加载UObject && SpawnActor 在世界中创建物体
 1. 创建FPakPlatformFile并初始化
