@@ -8,3 +8,4 @@
 * [使用C++创建蓝图资源并且附加组件](Notes/CreateBlueprintByCode.md)
 * [在UE中对Json序列化与反序列化](Notes/JsonForUe4.md)
 * [自定义动画节点](Notes/CustomAnimNode.md)
+* [Pak资源打包加载流程](Notes/Create&LoadPak.md)
