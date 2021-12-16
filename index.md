@@ -9,3 +9,5 @@
 * [在UE中对Json序列化与反序列化](Notes/JsonForUe4.md)
 * [自定义动画节点](Notes/CustomAnimNode.md)
 * [Pak资源打包加载流程](Notes/Create&LoadPak.md)
+* [UE4配置（Config）](Notes/UE4Config.md)
+* [控制台变量](Notes/ConsoleManager.md)
