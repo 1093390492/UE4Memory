@@ -16,7 +16,7 @@ virtual void Tick(float DeltaTime) override
 	//do something in Tick		
 }
 ```
-3. 实现GetStatId，如果该类继承了UObject，则在Uobject里已实现GetStatId
+1. 实现GetStatId （用于性能监测与调试标记）
 ```C++
 virtual TStatId GetStatId() const override
 {
