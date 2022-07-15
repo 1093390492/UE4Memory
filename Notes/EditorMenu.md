@@ -1,120 +1,163 @@
-## 使用UMG制作插件
+##UE5扩展编辑器菜单
+####创建一个工具栏按钮插件来启动UMG（设定UI Style）
 
-以往UE4制作带UI界面的插件需要使用Slate来编写UI，虽然说Slate为适配UI做了大量的宏，但说到底纯代码构筑UI还是反直觉。  
-UE4.26版本后添加了EditorUilityWidget类型，可以使用UMG制作UI，并且直接在编辑状态直接执行。  
-右键创建资源Editor Utilities ->Editor Utility Widget
-右键Editor Utility Widget资源Run Editor Utility Widget即可直接在编辑器状态运行该Widget。
-## 例
-首先设计一个文本输入框的UI界面，一个多行输入和一个按钮。  
-![alt 界面](https://1093390492.github.io/Image/UMG2Slate/0.png)
+资源目录如下
+![alt 界面](https://1093390492.github.io/Image/EditorMenu/2.png)
 
-制作按钮点击的蓝图事件。  
-![alt 点击事件](https://1093390492.github.io/Image/UMG2Slate/1.png)
-
-在编辑器中运行这个Editor Utility Widget，效果如下  
-![alt 效果](https://1093390492.github.io/Image/UMG2Slate/2.png)  
-
----
-
-然而在实际开发使用中，一般的插件要是都用右击运行Editor Utility Widget的方式还是繁琐，尤其是制作的多了不便于管理，所以还是需要结合Slate来制作插件。
-## 例
-1. 首先在UE4内创建一个插件，选择独立窗口的模板 Editor Standalone Window,起名 OpenTextEditor，创建完成后记得修改插件的偏好，勾上Can Contain Content，这样才能让这个插件附带资源，我们需要创建Editor Utility Widget给插件使用。 
-2. 将我们刚刚创建的Editor Utility Widget移动到 Editor Utility Widget的Content资源文件夹内。
-3. 创建完成后编辑器内是看不到插件的代码的，因为UE4帮我们创建的类并不继承UClass，需要到IDE内打开OpenTextEditorModule编辑。
-
-
----
-核心代码
-头文件添加一个 TSharedPtr\<SWidget\> EditorBoxWidget 用于保存从uusewidget拿到的slate类widget. 
-GenerateWidget函数用于从本地Editor Utility Widget生成我们所需要的SWidget。
-```C++
-#pragma once
-
-#include "CoreMinimal.h"
-#include "Modules/ModuleManager.h"
-
-class FToolBarBuilder;
-class FMenuBuilder;
-
-class FOpenTextEditorModule : public IModuleInterface
+打开XXXStyle.cpp
+``` C++
+const FVector2D Icon16x16(16.0f, 16.0f);
+const FVector2D Icon20x20(20.0f, 20.0f);
+const FVector2D Icon128x128(128.0f, 128.0f); //声明分辨率
+// const FVector2D Icon256x256(256.0f, 256.0f);
+TSharedRef< FSlateStyleSet > FObjectColorMarkStyle::Create()
 {
-public:
+	TSharedRef< FSlateStyleSet > Style = MakeShareable(new FSlateStyleSet("ObjectColorMarkStyle"));
 
-	/** IModuleInterface implementation */
-	virtual void StartupModule() override;
-	virtual void ShutdownModule() override;
-	
-	/** This function will be bound to Command (by default it will bring up plugin window) */
-	void PluginButtonClicked();
-	
-private:
+	//设定搜索Icon资源的根目录
+	Style->SetContentRoot(IPluginManager::Get().FindPlugin("ObjectColorMark")->GetBaseDir() / TEXT("Resources"));
 
-	void RegisterMenus();
+	//Style->Set("ObjectColorMark.PluginAction", new IMAGE_BRUSH_SVG(TEXT("PlaceholderButtonIcon"), Icon20x20));
 
-	TSharedRef<class SDockTab> OnSpawnPluginTab(const class FSpawnTabArgs& SpawnTabArgs);
-	
-	void GenerateWidget();
+	/** Style->Set为这个style增加一个FSlateBrush
+	* “"ObjectColorMark.PluginAction"”参数为标定的Style下的FSlateBrush的名称  后面
+	* new IMAGE_BRUSH (TEXT("Icon128"), Icon128x128) 
+	* TEXT("Icon128") 上面设置的资源的根目录下为不带后缀的图片资源文件名 Icon128x128为分辨率
+	*/
+	Style->Set("ObjectColorMark.PluginAction", new IMAGE_BRUSH (TEXT("Icon128"), Icon128x128));
 
-    ///保存从uusewidget拿到的slate类widget
-	TSharedPtr<SWidget> EditorBoxWidget;
+	//如果只有一个 在不设定Ui元素的icon时候 会使用这个默认的
 
-private:
-	TSharedPtr<class FUICommandList> PluginCommands;
-};
+	Style->Set("ObjectColorMark.LALA", new IMAGE_BRUSH_SVG (TEXT("PlaceholderButtonIcon"), Icon20x20));
+	return Style;
+}
 ```
-cpp文件
-```C++
+这里设置的FSlateBrush可以在FSlateIcon中使用
+``` C++
+FSlateIcon(FObjectColorMarkStyle::GetStyleSetName(), "ObjectColorMark.PluginAction")
+```
 
-TSharedRef<SDockTab> FOpenTextEditorModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnTabArgs)
+---------------
+``` C++
+void FObjectColorMarkModule::StartupModule()
 {
-///实际上GenerateWidget放到StartupModule函数内执行较好，这里为了文档结构，放到该函数内执行。
-	GenerateWidget();
+	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
+	
+	FObjectColorMarkStyle::Initialize(); //初始化style 内部会执行 上面的 Create函数
+	FObjectColorMarkStyle::ReloadTextures(); // 按照Create设定的读取目录加载硬盘图片资源
 
-	if(!EditorBoxWidget.IsValid())
-	{
-		return SNew(SDockTab)
-		.TabRole(ETabRole::NomadTab)
-		[
-			// Put your tab content here!
-			SNew(SBox)
-			.HAlign(HAlign_Center)
-			.VAlign(VAlign_Center)
-			[
-				SNew(STextBlock)
-				.Text(LOCTEXT("WindowWidgetText", "EditorWidget is NULL"))
-			]
-		];
-	}
-	else
-	{
-		return SNew(SDockTab)
-		.TabRole(ETabRole::NomadTab)
-		[
-		EditorBoxWidget.ToSharedRef()
-		];
-	}
+	FObjectColorMarkCommands::Register(); //构造单例并且注册Command
+	
+	PluginCommands = MakeShareable(new FUICommandList);
+
+
+	// 映射Commad的回调函数 FCanExecuteAction()参数位为判断执行条件函数回调
+	PluginCommands->MapAction(
+		FObjectColorMarkCommands::Get().PluginAction,
+		FExecuteAction::CreateRaw(this, &FObjectColorMarkModule::PluginButtonClicked),
+		FCanExecuteAction());
+
+	// 注册ToolMenus上的启动回调 在ToolMenus启动执行RegisterMenus 
+	UToolMenus::RegisterStartupCallback(FSimpleMulticastDelegate::FDelegate::CreateRaw(this, &FObjectColorMarkModule::RegisterMenus));
+
 
 }
+```
 
-...
-
-void FOpenTextEditorModule::GenerateWidget()
+``` C++
+void FObjectColorMarkModule::RegisterMenus()
 {
-	UUserWidget* UserWidget = nullptr;
-	
-    ///EditorUtilityWidgetBlueprint'/OpenTextEditor/TextEditorUMG.TextEditorUMG为我Editor Utility Widget的引用路径 后面加_C表示读取Class文件。
-	UClass* loadedClass = LoadClass<UUserWidget>(nullptr,TEXT("EditorUtilityWidgetBlueprint'/OpenTextEditor/TextEditorUMG.TextEditorUMG_C'"));
-
-	if(!loadedClass)
+	// Owner will be used for cleanup in call to UToolMenus::UnregisterOwner
+	FToolMenuOwnerScoped OwnerScoped(this);	// FToolMenuOwnerScoped构造的时候会把this传入OwnerStack
 	{
-		UE_LOG(LogTemp,Error,TEXT("EditorUtilityWidgetBlueprint'/OpenTextEditor/TextEditorUMG.TextEditorUMG_C' No Found"));
+		// "LevelEditor.MainMenu.Window"名称是Menu创建的时候注册的  UE5 ui调整 代码有所变化 逻辑依然类似
+		/*也有类似这种写法 UToolMenu* PlayToolBar = UToolMenus::Get()->RegisterMenu("LevelEditor.LevelEditorToolBar.PlayToolBar", NAME_None, EMultiBoxType::SlimHorizontalToolBar);
+
+		/*
+		FLevelEditorMenu::RegisterLevelEditorMenus
+
+		void FLevelEditorMenu::RegisterLevelEditorMenus()
+		{
+			struct Local
+			{
+					//...
+			};
+
+			UToolMenus* ToolMenus = UToolMenus::Get();
+			ToolMenus->RegisterMenu("LevelEditor.MainMenu", "MainFrame.MainMenu", EMultiBoxType::MenuBar);
+			ToolMenus->RegisterMenu("LevelEditor.MainMenu.File", "MainFrame.MainTabMenu.File");
+			ToolMenus->RegisterMenu("LevelEditor.MainMenu.Window", "MainFrame.MainMenu.Window");
+
+			// Add level loading and saving menu items
+			Local::RegisterFileLoadAndSaveItems();
+
+			// Add recent / favorites
+			Local::FillFileRecentAndFavoriteFileItems();
+
+			// Extend the Edit menu
+			Local::ExtendEditMenu();
+
+			// Extend the Help menu
+			Local::ExtendHelpMenu();
+		}
+		*/
+
+		UToolMenu* Menu = UToolMenus::Get()->ExtendMenu("LevelEditor.MainMenu.Window");
+		{
+			FToolMenuSection& Section = Menu->FindOrAddSection("WindowLayout");
+			Section.AddMenuEntryWithCommandList(FObjectColorMarkCommands::Get().PluginAction, PluginCommands);
+		}
+	}
+
+	{
+		UToolMenu* ToolbarMenu = UToolMenus::Get()->ExtendMenu("LevelEditor.LevelEditorToolBar.PlayToolBar");
+		{
+			FToolMenuSection& Section = ToolbarMenu->FindOrAddSection("Play"); //
+			{
+				FToolMenuEntry& Entry = Section.AddEntry(FToolMenuEntry::InitToolBarButton(FObjectColorMarkCommands::Get().PluginAction));
+				Entry.SetCommandList(PluginCommands);
+				
+				// 想要自定义或者有多个Icon设定可以单独设定Entry的Icon属性
+				Entry.Icon = FSlateIcon(FObjectColorMarkStyle::GetStyleSetName(),"ObjectColorMark.LALA");
+
+			}
+		}
+	}
+}
+```
+特别值得一提的是ToolbarMenu->FindOrAddSection("XXX") 获取的Section得首先确定UToolMenus::Get()->ExtendMenu。
+例如像放到Play之后
+![alt 界面](https://1093390492.github.io/Image/EditorMenu/0.png)
+就得获取"LevelEditor.LevelEditorToolBar.PlayToolBar"，
+如果要放到Content之后就需要获取"LevelEditor.LevelEditorToolBar.AssetsToolBar"并且ToolbarMenu->FindOrAddSection("Play")。
+![alt 界面](https://1093390492.github.io/Image/EditorMenu/1.png)
+具体Name得翻源码寻找。
+在实际开发中自己扩展出来的自定义Menu即可
+
+最后是启动目录下的Editor UMG
+```C++
+void FObjectColorMarkModule::GenerateWidget()
+{
+
+	UBlueprint* WidgetBlueprint = LoadObject<UEditorUtilityWidgetBlueprint>(nullptr,TEXT("EditorUtilityWidgetBlueprint'/ObjectColorMark/MenuToolList.MenuToolList'"));
+
+	if(!WidgetBlueprint)
+	{
+		UE_LOG(LogTemp,Error,TEXT("EditorUtilityWidgetBlueprint'/ObjectColorMark/MenuToolList.MenuToolList' No Found"));
 		return;
 	}
-
-	UUserWidget* widget = CreateWidget<UUserWidget>(GEditor->GetEditorWorldContext().World(),loadedClass);
+	if(WidgetBlueprint)
+	{
+		if (WidgetBlueprint->GeneratedClass->IsChildOf(UEditorUtilityWidget::StaticClass()))
+		{
+			UEditorUtilityWidgetBlueprint* EditorUtilityWidget = Cast<UEditorUtilityWidgetBlueprint>(WidgetBlueprint);
+			if(EditorUtilityWidget)
+			{
+				UEditorUtilitySubsystem* EditorUtilitySubsystem = GEditor->GetEditorSubsystem<UEditorUtilitySubsystem>();
+				EditorUtilitySubsystem->SpawnAndRegisterTab(EditorUtilityWidget);
+			}
+		}
+	}
 	
-	EditorBoxWidget = widget->TakeWidget();
 }
-
 ```
-编译->重启Ue4->点击工具栏的OpenTExtEditor->正常打开制作的UMG界面
