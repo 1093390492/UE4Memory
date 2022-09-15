@@ -51,3 +51,15 @@ public:
 	UPROPERTY(Instanced,EditAnywhere,BlueprintReadWrite)
 	UMyObject* MyClass;
 ```
+
+#### InlineEditConditionToggle && EditCondition && Units
+InlineEditConditionToggle 表示出布尔属性只内联显示为其他属性中的一个编辑条件切换，不应显示在其自身的行上。
+人话就是这个可以用来表示另一个属性编辑的激活与未激活
+``` C++
+UPROPERTY(EditAnywhere, meta=(InlineEditConditionToggle))
+bool bCanFly;
+
+UPROPERTY(EditAnywhere, meta=(EditCondition="bCanFly", Units="s"))
+float FlapPeriodSeconds;
+```
+![alt 蓝图节点效果](https://1093390492.github.io/Image/Unreal_MetaWold/1.gif)

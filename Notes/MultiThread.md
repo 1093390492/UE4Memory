@@ -1,6 +1,21 @@
 
-## 多线程的两种方案
+## 多线程的几种方案
 以计算素数为例
+
+---
+最常用也是最简单的
+### AsyncTask
+
+``` C++
+AsyncTask(ENamedThreads::GameThread, [mainMessage, byteDataArray, clientConnectionIDGlobal, tcpClientGlobal, socketClientGlobal]() {
+	if (socketClientGlobal != nullptr)
+		socketClientGlobal->onreceiveTCPMessageEventDelegate.Broadcast(mainMessage, byteDataArray, clientConnectionIDGlobal);
+	if (tcpClientGlobal != nullptr)
+		tcpClientGlobal->onreceiveTCPMessageEventDelegate.Broadcast(mainMessage, byteDataArray, clientConnectionIDGlobal);
+});
+```
+以一个TCP通讯代码节选为例
+第一个参数ENamedThreads::GameThread设定任务跑在那个线程上，值得一提的是，即使设定为ENamedThreads::GameThread这个地方也不会阻塞，由UE决定在某个时间在游戏线程执行任务。
 
 ---
 ### Async

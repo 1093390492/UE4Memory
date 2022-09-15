@@ -96,7 +96,8 @@
 	]
 	}
 	```
-	这个Name ： MultiModifyCurveAnimNodeEditor就是上面IMPLEMENT_MODULE的第二个参数。
+	IMPLEMENT_MODULE 是用于导出DLL给其他模块使用
+	**这个Name ： MultiModifyCurveAnimNodeEditor和build.cs文件名和build.cs的类名严格匹配**
 	重点在于这个"Type": "UncookedOnly"。Type如果为Editor，编辑器会警告，如果是runtime则会在打包时报错。UncookedOnly则在Cook时跳过这个模块。
 	以下是各类Type含义  
 	```C#
