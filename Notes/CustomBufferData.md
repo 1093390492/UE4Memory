@@ -1,12 +1,12 @@
-##UE5传递自定义Buffer数据至后处理（不编译源码）
+## UE5传递自定义Buffer数据至后处理（不编译源码）
 关于在在GBuffer中写入自定义数据的功能网络上资料并不少见，大多要魔改引擎。
 这里的手段主要参考 Github上一个UE的合并请求（最终打回） 
 https://github.com/EpicGames/UnrealEngine/pull/8403
 这里手段类似，但是做了cpp的绕过处理，直接修改了ush的指令，强制开启了CustomData的通道，所有的shadingmodel都会被额外开启两个通道，所以性能上有影响。
 
-###$\color{Red}{警告 这里修改了引擎底层ush文件，会导致所有的项目在启动时重新编译Shader，强烈建议备份数据，包括备份引擎数据}$
+### $\color{Red}{警告 这里修改了引擎底层ush文件，会导致所有的项目在启动时重新编译Shader，强烈建议备份数据，包括备份引擎数据}$
 
-####思考与流程
+#### 思考与流程
 `MaterialTemplate.ush`
 SceneTextureLookup函数会尝试冲场景数据中取出对应的数据，到后处理材质的节点SceneTexture返回出来。
 GetScreenSpaceData(UV, false)函数则是在`DeferredShadingCommon.ush`中实现，
@@ -86,7 +86,7 @@ PPI_PostProcessInput 就是这个SceneTexure里面的一个选择输出的信息
 	}
 #endif
 ```
-这里<color="red">`GetCustomShading0`<color="red">是UMaterialExpressionCustomOutput的`GetFunctionName`数据，这个名称会对应UMaterialExpressionCustomOutput扩展出来的输出节点，具体名字可以到材质里用ShaderCode模式查看。
+这里$\color{Red}{GetCustomShading0}$是UMaterialExpressionCustomOutput的`GetFunctionName`数据，这个名称会对应UMaterialExpressionCustomOutput扩展出来的输出节点，具体名字可以到材质里用ShaderCode模式查看。
 这里给出对应代码与ShderCode
 ```C++
 
