@@ -63,3 +63,8 @@ UPROPERTY(EditAnywhere, meta=(EditCondition="bCanFly", Units="s"))
 float FlapPeriodSeconds;
 ```
 ![alt 蓝图节点效果](https://1093390492.github.io/Image/Unreal_MetaWold/1.gif)
+
+#### MustImplement=""
+用于 Subclass 和 SoftClass 属性。指示所选类必须实现特定接口
+UPROPERTY(EditAnywhere, meta=(MustImplement="InteractibleInterface"))
+TSubclassOf<AActor> InteractibleActor;
