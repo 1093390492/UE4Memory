@@ -18,6 +18,9 @@ title: meteoc's notebook
 description: 天气轮的笔记本
 #theme: jekyll-theme-cayman
 
-github:
-zip_url: http://example.com/download.zip
-another_url: another value
+show_downloads: true
+google_analytics:
+
+# github:
+# zip_url: http://example.com/download.zip
+# another_url: another value
