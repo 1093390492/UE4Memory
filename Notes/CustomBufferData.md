@@ -247,3 +247,7 @@ ShaderMaterialDerivedHelpers.cpp
 
 理论上现在已经可以成功把数据写入我们这里定的Gbuffer内了，但是最后还有一个重点，屏幕UV和Buffer UV对不上。因为UE的ViewportUV 和 BufferUV并不是1：1对应关系，UE已经有封装好的转换函数，而其他的processpost不需要转换是因为这的processpost0~4已经被UE采样为texture，采样时的UV已经经过转换，而我们这里是直接写入的Gbuffer，需要使用BufferUV，而非ViewportUV。
 ![alt 界面](https://1093390492.github.io/Image/CustomBufferData/1.jpg)
+这个自定义ViewportUVToBufferUV hlsl代码为
+```
+return ViewportUVToBufferUV(ViewportUV);
+```
