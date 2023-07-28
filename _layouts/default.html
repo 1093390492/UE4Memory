@@ -15,23 +15,15 @@
   <body>
     <a id="skip-to-content" href="#content">Skip to the content.</a>
 
-    <ul>
-      <li><a href="#home">主页</a></li>
-      <li><a href="#news">新闻</a></li>
-      <li><a href="#contact">联系</a></li>
-      <li><a href="#about">关于</a></li>
-    </ul>
-
     <header class="page-header" role="banner">
+
+
       <h1 class="project-name">{{ page.title | default: site.title | default: site.github.repository_name }}</h1>
       <h2 class="project-tagline">{{ page.description | default: site.description | default: site.github.project_tagline }}</h2>
-      {% if site.github.is_project_page %}
-        <a href="{{ site.github.repository_url }}" class="btn">View on GitHub</a>
-      {% endif %}
-      {% if site.show_downloads %}
-        <a href="{{ site.github.zip_url }}" class="btn">Download 2333 .zip</a>
-        <a href="{{ site.github.tar_url }}" class="btn">Download lala.tar.gz</a>
-      {% endif %}
+
+      <a href="https://1093390492.github.io/index.html" class="btn">UE笔记</a>
+      <a href="https://1093390492.github.io/other.html" class="btn">杂记</a>
+
     </header>
 
     <main id="content" class="main-content" role="main">
