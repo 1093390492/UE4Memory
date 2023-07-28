@@ -21,6 +21,6 @@ description: 天气轮的笔记本
 show_downloads: true
 google_analytics:
 
-# github:
-# zip_url: http://example.com/download.zip
-# another_url: another value
+github:
+zip_url: http://www.baidu.com/
+another_url: another value
