@@ -19,8 +19,7 @@ description: 天气轮的笔记本
 #theme: jekyll-theme-cayman
 
 show_downloads: true
-google_analytics:
 
-github:
+github: http://www.baidu.com/
 zip_url: http://www.baidu.com/
 another_url: another value
